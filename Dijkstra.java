@@ -1,96 +1,149 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Scanner;
 
-public class Dijkstra { //ÀÎÁ¢ Çà·Ä ¹æ½Ä
+public class Dijkstra { //ì¸ì ‘ í–‰ë ¬ ë°©ì‹
 	
 	static Scanner sc =new Scanner(System.in); 
-	static int graph[][];
-	static int V, E; // Á¤Á¡°ú °£¼±
-	static int D[]; // ÃÖ¼Ò °Å¸® ´ã´Â ¹è¿­
-	static int start ; // ½ÃÀÛ Á¤Á¡
-	static List<Integer> proc = new ArrayList<>(); //DFS ¼ø¼­
+	static int graph[][];  //ì¸ì ‘í–‰ë ¬ìš© ê·¸ë˜í”„
+	static int V, E; // ì •ì ê³¼ ê°„ì„ 
+	static int D[]; // ìµœì†Œ ê±°ë¦¬ ë‹´ëŠ” ë°°ì—´
+	static int start ; // ì‹œì‘ ì •ì 
+	static List<Integer> proc = new ArrayList<>(); //DFS ìˆœì„œ
 	
 	public static void main(String[] args) {
-		
-		System.out.print("Á¤Á¡ÀÇ °³¼ö¸¦ ÀÔ·ÂÇØ ÁÖ¼¼¿ä >> ");
-		V = sc.nextInt(); // Á¤Á¡ÀÇ °³¼ö
-		
-		System.out.print("°£¼±ÀÇ °³¼ö¸¦ ÀÔ·ÂÇØ ÁÖ¼¼¿ä >> ");
-		E = sc.nextInt(); // °£¼±ÀÇ °³¼ö
-
-		//¹æ¹® ¹è¿­ »ı¼º
-		boolean visit[] =new boolean[V];
-		
-		// ±×·¡ÇÁ&°Å¸® ¹è¿­ »ı¼º
-		graph =new int[V][V];
+		/*
+		 * System.out.print("ì •ì ì˜ ê°œìˆ˜ë¥¼ ì…ë ¥í•´ ì£¼ì„¸ìš” >> "); V = sc.nextInt(); // ì •ì ì˜ ê°œìˆ˜
+		 * 
+		 * System.out.print("ê°„ì„ ì˜ ê°œìˆ˜ë¥¼ ì…ë ¥í•´ ì£¼ì„¸ìš” >> "); E = sc.nextInt(); // ê°„ì„ ì˜ ê°œìˆ˜
+		 * 
+		 * //ë°©ë¬¸ ë°°ì—´ ìƒì„± boolean visit[] =new boolean[V];
+		 * 
+		 * // ê·¸ë˜í”„&ê±°ë¦¬ ë°°ì—´ ìƒì„± graph =new int[V][V]; D = new int[V];
+		 * 
+		 * // ê·¸ë˜í”„& ê±°ë¦¬ ë°°ì—´ ì´ˆê¸°í™” for(int i=0; i<V; i++) { Arrays.fill(graph[i],
+		 * Integer.MAX_VALUE); } Arrays.fill(D, Integer.MAX_VALUE);
+		 * 
+		 * // ê°„ì„ ê³¼ ê°€ì¤‘ì¹˜ ì…ë ¥ë°›ìŒ // ì¸ì ‘í–‰ë ¬ êµ¬ì„± for (int i = 0; i < E; i++) {
+		 * System.out.print("ì •ì 1 ì •ì 2 ê°€ì¤‘ì¹˜ ì…ë ¥ >> "); int v1 = sc.nextInt(); int v2 =
+		 * sc.nextInt(); int w = sc.nextInt(); graph[v1][v2] = w; graph[v2][v1] = w; }
+		 * System.out.println("ê·¸ë˜í”„ ìƒì„± ì™„ë£Œ\n");
+		 * 
+		 * System.out.print("ì‹œì‘í•  ì •ì  ì…ë ¥ >> "); start = sc.nextInt();
+		 * 
+		 * // ì‹œì‘ ì •ì ê°’ ì´ˆê¸°í™” D[start]=0; visit[start]=true;
+		 * System.out.println("\n"+start+"ì •ì ì—ì„œ ì‹œì‘í•©ë‹ˆë‹¤");
+		 * 
+		 * //ë‹¤ìµìŠ¤íŠ¸ë¼ ì•Œê³ ë¦¬ì¦˜(ì¸ì ‘í–‰ë ¬) for(int i=0; i<V; i++) { int min = Integer.MAX_VALUE; // ìµœì†Œ ë¹„êµí•˜ê¸°
+		 * ìœ„í•´ int index = 0; // ì¸ë±ìŠ¤ ì €ì¥ ë³€ìˆ˜
+		 * 
+		 * for(int j=0; j<V; j++) { if(!visit[j] && (D[j] < min)) { // ë°©ë¬¸x ì •ì  ì¤‘ ìµœì†Œë¹„ìš© ì°¾ê¸°
+		 * min=D[i]; //ìµœì†Œê°’ ë°”ê¿”ì¤Œ index = j; } } // ìµœì†Œë¹„ìš© ì •ì  ë°©ë¬¸ visit[index]=true;
+		 * proc.add(index); System.out.println("ë°©ë¬¸ = "+proc);
+		 * 
+		 * 
+		 * // í•´ë‹¹ ì •ì  ê¸°ì¤€ ì¸ì ‘ë…¸ë“œë“¤ ë¹„ìš© í™•ì¸ for(int k=0; k<V; k++) { if(!visit[k] &&
+		 * (graph[index][k] != Integer.MAX_VALUE) ) { // ë¹„ìš©ì„ í™•ì¸ ê°€ëŠ¥í•˜ê³  ë°©ë¬¸x ì¸ì ‘ë…¸ë“œ ì¤‘ì—ì„œ
+		 * if(D[index] + graph[index][k] < D[k]) { //í•´ë‹¹ ë…¸ë“œë¥¼ ê±°ì³ê°€ëŠ”ê²Œ ë¹ ë¥´ë©´ D[k] = D[index] +
+		 * graph[index][k]; // ê·¸ ë…¸ë“œê¹Œì§€ì˜ ë¹„ìš©ì„ ê°±ì‹ í•¨ } } }
+		 * 
+		 * // ì¶œë ¥ìš© for(int p =0; p<V; p++) { if(D[p]==Integer.MAX_VALUE) {
+		 * System.out.println("ì •ì "+p+" ê¹Œì§€ì˜ ê±°ë¦¬ = âˆ"); }else {
+		 * System.out.println("ì •ì "+p+" ê¹Œì§€ì˜ ê±°ë¦¬ = "+D[p]); } }
+		 * System.out.println("------------------------\n\n"); }
+		 * 
+		 * sc.close();
+		 */
+		//ìš°ì„ ìˆœìœ„ í êµ¬í˜„------------------------------------------------------------------------------------//		
+	
+		PriorityQueue<Node> queue =new PriorityQueue<>();// ë…¸ë“œê±°ë¦¬ ì €ì¥ ìš°ì„ ìˆœìœ„ í 
+	
+		System.out.print("ì •ì ì˜ ê°œìˆ˜ë¥¼ ì…ë ¥í•´ ì£¼ì„¸ìš” >> "); 
+		V = sc.nextInt(); // ì •ì ì˜ ê°œìˆ˜
+		 
+		System.out.print("ê°„ì„ ì˜ ê°œìˆ˜ë¥¼ ì…ë ¥í•´ ì£¼ì„¸ìš” >> "); 
+		E = sc.nextInt(); // ê°„ì„ ì˜ ê°œìˆ˜
+	
+		// ê·¸ë˜í”„ ìƒì„± 
+		graph = new int[V][V]; 
 		D = new int[V];
 		
-		// ±×·¡ÇÁ& °Å¸® ¹è¿­ ÃÊ±âÈ­
-		for(int i=0; i<V; i++) {
-			Arrays.fill(graph[i], Integer.MAX_VALUE); 
+		//ë°©ë¬¸ ë°°ì—´ ìƒì„± 
+		boolean visit[] = new boolean[V];
+		
+		// ê·¸ë˜í”„ ì´ˆê¸°í™” 
+		for(int i=0; i<V; i++) { 
+			Arrays.fill(graph[i],Integer.MAX_VALUE); 
 		}
 		Arrays.fill(D, Integer.MAX_VALUE);
-		
-		// °£¼±°ú °¡ÁßÄ¡ ÀÔ·Â¹ŞÀ½
-		// ÀÎÁ¢Çà·Ä ±¸¼º
+
+		// ê°„ì„ ê³¼ ê°€ì¤‘ì¹˜ ì…ë ¥ë°›ìŒ
 		for (int i = 0; i < E; i++) {
-			System.out.print("Á¤Á¡1 Á¤Á¡2 °¡ÁßÄ¡ ÀÔ·Â >> ");
-			int v1 = sc.nextInt();
-			int v2 = sc.nextInt();
-			int w = sc.nextInt();
-			graph[v1][v2] = w;
+			System.out.print("ì •ì 1 ì •ì 2 ê°€ì¤‘ì¹˜ ì…ë ¥ >> "); 
+			int v1 = sc.nextInt(); 
+			int v2 = sc.nextInt(); 
+			int w = sc.nextInt(); 
+			graph[v1][v2] = w; 
 			graph[v2][v1] = w; 
 		}
-		System.out.println("±×·¡ÇÁ »ı¼º ¿Ï·á\n");
+		System.out.println("ê·¸ë˜í”„ ìƒì„± ì™„ë£Œ\n");
 		
-		System.out.print("½ÃÀÛÇÒ Á¤Á¡ ÀÔ·Â >> ");
+		System.out.print("ì‹œì‘í•  ì •ì  ì…ë ¥ >> "); 
 		start = sc.nextInt();
-		
-		// ½ÃÀÛ Á¤Á¡°ª ÃÊ±âÈ­
+	
+		//ì‹œì‘ ë…¸ë“œ ì´ˆê¸°í™”.
+		queue.add(new Node(start, 0));
 		D[start]=0;
 		visit[start]=true;
-		System.out.println("\n"+start+"Á¤Á¡¿¡¼­ ½ÃÀÛÇÕ´Ï´Ù");
 		
-		//´ÙÀÍ½ºÆ®¶ó ¾Ë°í¸®Áò
-		for(int i=0; i<V; i++) {
-			int min = Integer.MAX_VALUE; // ÃÖ¼Ò ºñ±³ÇÏ±â À§ÇØ
-			int index = 0; // ÀÎµ¦½º ÀúÀå º¯¼ö
+		System.out.println("\n"+start+"ì •ì ì—ì„œ ì‹œì‘í•©ë‹ˆë‹¤");
+		
+		//ë‹¤ìµìŠ¤íŠ¸ë¼ ì•Œê³ ë¦¬ì¦˜(ìš°ì„ ìˆœìœ„ í)
+		while(!queue.isEmpty()) { //íê°€ ë¹„ì–´ìˆì„ ë•Œê¹Œì§€
+			//ë…¸ë“œ ìµœì†Œê°’ êº¼ëƒ„
 			
-			for(int j=0; j<V; j++) {
-				if(!visit[j] && (D[j] < min)) { // ¹æ¹®x Á¤Á¡ Áß ÃÖ¼Òºñ¿ë Ã£±â
-					min=D[i]; //ÃÖ¼Ò°ª ¹Ù²ãÁÜ
-					index = j; 
-				}
-			}
-			// ÃÖ¼Òºñ¿ë Á¤Á¡ ¹æ¹®
-			visit[index]=true;
-			proc.add(index);
-			System.out.println("¹æ¹® = "+proc);
+			Node qurrentNode = queue.poll();
+			int min = qurrentNode.weight;
+			int index = qurrentNode.index;
 			
+			// ì›ë˜ëŠ” íê°€ ë¹Œ ë•Œê¹Œì§€ ì¶œë ¥í•´ì„œ ë” ì¶œë ¥ë¨
+			// ì´ ì½”ë“œ ì¶”ê°€ì‹œ ì¸ì ‘í–‰ë ¬ê³¼ ê°™ì€ ì§„í–‰ìƒí™©ë§Œ ì¶œë ¥ ê°€ëŠ¥
+			if(D[index]<min) {continue;} 
+			visit[index] = true;
 			
-			// ÇØ´ç Á¤Á¡ ±âÁØ ÀÎÁ¢³ëµåµé ºñ¿ë È®ÀÎ  
-			for(int k=0; k<V; k++) {
-				if(!visit[k] && (graph[index][k] != Integer.MAX_VALUE) ) { // ºñ¿ëÀ» È®ÀÎ °¡´ÉÇÏ°í ¹æ¹®x ÀÎÁ¢³ëµå Áß¿¡¼­ 
-					if(D[index] + graph[index][k] < D[k]) { //ÇØ´ç ³ëµå¸¦ °ÅÃÄ°¡´Â°Ô ºü¸£¸é
-						D[k] = D[index] + graph[index][k]; // ±× ³ëµå±îÁöÀÇ ºñ¿ëÀ» °»½ÅÇÔ
+			//ë‹¤ë¥¸ ë…¸ë“œë¥¼ ê±°ì³ê°€ëŠ”ê²Œ ë¹„ìš©ì´ ë” ì ì€ì§€ í™•ì¸
+			for(int i=0; i<V; i++) {
+				if(!visit[i] && (graph[index][i] < Integer.MAX_VALUE )) {
+					if(D[index] + graph[index][i]<D[i]) {
+						D[i] = D[index] + graph[index][i];
+						queue.add(new Node(i, D[i]));
 					}
 				}
 			}
-			
-			// Ãâ·Â¿ë
+		
 			for(int p =0; p<V; p++) {
 				if(D[p]==Integer.MAX_VALUE) {
-					System.out.println("Á¤Á¡"+p+" ±îÁöÀÇ °Å¸® = ¡Ä");
+					System.out.println("ì •ì "+p+" ê¹Œì§€ì˜ ê±°ë¦¬ = âˆ");
 				}else {
-					System.out.println("Á¤Á¡"+p+" ±îÁöÀÇ °Å¸® = "+D[p]);
+					System.out.println("ì •ì "+p+" ê¹Œì§€ì˜ ê±°ë¦¬ = "+D[p]);
 				}
 			}
 			System.out.println("------------------------\n\n");
 		}
-		
-		sc.close();
 	}
 
+	static class Node implements Comparable<Node>{
+		int index, weight; //ë‹¤ìŒ ì¸ë±ìŠ¤, ë¹„ìš©
+		public Node(int i, int w){
+			this.index =i;
+			this.weight=w;
+		}
+		@Override
+		public int compareTo(Node node) {
+			return Integer.compare(this.weight, node.weight);
+		}
+	}
+	
 }
